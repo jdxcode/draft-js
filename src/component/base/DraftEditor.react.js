@@ -315,11 +315,16 @@ class DraftEditor extends React.Component<DraftEditorProps, State> {
     return null;
   }
 
+  /**
+   * returns ariaDescribedBy prop with '{{PLACEHOLDER}}' replaced with
+   * the DOM id of the placeholder (if it exists)
+   * @returns aria-describedby attribute value
+   */
   _renderAriaDescribedBy(): ?string {
+    const dscby = this.props.ariaDescribedBy || '';
     const plid = this._showPlaceholder()
       ? this._placeholderAccessibilityID
       : '';
-    const dscby = this.props.ariaDescribedBy || '';
     return dscby.replace('{{PLACEHOLDER}}', plid) || null;
   }
 
