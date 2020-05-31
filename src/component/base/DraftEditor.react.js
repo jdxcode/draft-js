@@ -134,6 +134,7 @@ class UpdateDraftEditorFlags extends React.Component<{
  */
 class DraftEditor extends React.Component<DraftEditorProps, State> {
   static defaultProps: DraftEditorDefaultProps = {
+    ariaDescribedBy: '{{PLACEHOLDER}}',
     blockRenderMap: DefaultDraftBlockRenderMap,
     blockRendererFn: function() {
       return null;
@@ -314,6 +315,14 @@ class DraftEditor extends React.Component<DraftEditorProps, State> {
     return null;
   }
 
+  _renderAriaDescribedBy(): ?string {
+    const plid = this._showPlaceholder()
+      ? this._placeholderAccessibilityID
+      : '';
+    const dscby = this.props.ariaDescribedBy || '';
+    return dscby.replace('{{PLACEHOLDER}}', plid) || null;
+  }
+
   render(): React.Node {
     const {
       blockRenderMap,
@@ -381,9 +390,7 @@ class DraftEditor extends React.Component<DraftEditorProps, State> {
             }
             aria-autocomplete={readOnly ? null : this.props.ariaAutoComplete}
             aria-controls={readOnly ? null : this.props.ariaControls}
-            aria-describedby={
-              this.props.ariaDescribedBy || this._placeholderAccessibilityID
-            }
+            aria-describedby={this._renderAriaDescribedBy()}
             aria-expanded={readOnly ? null : ariaExpanded}
             aria-label={this.props.ariaLabel}
             aria-labelledby={this.props.ariaLabelledBy}

@@ -14,6 +14,7 @@ jest.mock('generateRandomKey');
 
 const DraftEditor = require('DraftEditor.react');
 const React = require('React');
+const EditorState = require('EditorState');
 
 const ReactShallowRenderer = require('react-test-renderer/shallow');
 
@@ -45,4 +46,68 @@ test('must has editorKey same as props', () => {
   const getEditorKey =
     shallow._instance.getEditorKey || shallow._instance._instance.getEditorKey;
   expect(getEditorKey()).toMatchSnapshot();
+});
+
+describe('ariaDescribedBy', () => {
+  function getProps(elem) {
+    const r = shallow.render(elem);
+    const ec = r.props.children[1].props.children;
+    return ec.props;
+  }
+
+  describe('without placeholder', () => {
+    test('null by default', () => {
+      const props = getProps(<DraftEditor />);
+      expect(props).toHaveProperty('aria-describedby', null);
+    });
+
+    test('can be set to something arbitrary', () => {
+      const props = getProps(<DraftEditor ariaDescribedBy="abc" />);
+      expect(props).toHaveProperty('aria-describedby', 'abc');
+    });
+
+    test('can use special token', () => {
+      const props = getProps(
+        <DraftEditor ariaDescribedBy="abc {{PLACEHOLDER}} xyz" />,
+      );
+      expect(props).toHaveProperty('aria-describedby', 'abc  xyz');
+    });
+  });
+
+  describe('with placeholder', () => {
+    test('has placeholder id by default', () => {
+      const props = getProps(
+        <DraftEditor
+          editorState={EditorState.createEmpty()}
+          editorKey="X"
+          placeholder="place"
+        />,
+      );
+      expect(props).toHaveProperty('aria-describedby', 'placeholder-X');
+    });
+
+    test('can be set to something arbitrary', () => {
+      const props = getProps(
+        <DraftEditor
+          editorState={EditorState.createEmpty()}
+          editorKey="X"
+          placeholder="place"
+          ariaDescribedBy="abc"
+        />,
+      );
+      expect(props).toHaveProperty('aria-describedby', 'abc');
+    });
+
+    test('can use special token', () => {
+      const props = getProps(
+        <DraftEditor
+          editorState={EditorState.createEmpty()}
+          editorKey="X"
+          placeholder="place"
+          ariaDescribedBy="abc {{PLACEHOLDER}} xyz"
+        />,
+      );
+      expect(props).toHaveProperty('aria-describedby', 'abc placeholder-X xyz');
+    });
+  });
 });
